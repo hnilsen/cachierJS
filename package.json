@@ -1,0 +1,52 @@
+{
+  "name": "cachier",
+  "description": "Javascript preloader for Javascript, CSS and HTML (Application Cache alternative)",
+  "version": "1.0.0",
+  "homepage": "https://github.com/SparebankenVest/cachierJS",
+  "author": "Sparebanken Vest <opensource@spv.no>",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/SparebankenVest/cachierJS.git"
+  },
+  "bugs": {
+    "url": "https://github.com/SparebankenVest/cachierJS/issues"
+  },
+  "licenses": [
+    {
+      "type": "MIT",
+      "url": "https://github.com/SparebankenVest/cachierJS/blob/master/LICENSE"
+    }
+  ],
+  "main": "lib/cachier",
+  "engines": {
+    "node": ">= 0.10.0"
+  },
+  "scripts": {
+    "test": "grunt nodeunit"
+  },
+  "devDependencies": {
+    "grunt": "~0.4.5",
+    "grunt-contrib-concat": "~0.3.0",
+    "grunt-contrib-jshint": "~0.6.0",
+    "grunt-contrib-nodeunit": "~0.2.0",
+    "grunt-contrib-uglify": "~0.2.0",
+    "grunt-contrib-watch": "~0.4.0",
+    "grunt-karma": "^0.10.1",
+    "jasmine": "~2.2.0",
+    "jasmine-ajax": "~3.1.0",
+    "karma": "~0.12.0",
+    "karma-chrome-launcher": "^0.1.8",
+    "karma-jasmine": "~0.2.0",
+    "karma-phantomjs-launcher": "^0.1.4",
+    "karma-requirejs": "^0.2.2",
+    "karma-sinon": "^1.0.4",
+    "local-xmlhttprequest": "~1.5.0",
+    "requirejs": "^2.1.17",
+    "sinon": "^1.14.1"
+  },
+  "keywords": [],
+  "directories": {
+    "test": "test"
+  },
+  "license": "MIT"
+}
