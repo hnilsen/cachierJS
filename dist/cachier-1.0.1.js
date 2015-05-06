@@ -1,4 +1,4 @@
-/*! cachier - v1.0.0 - 2015-04-24
+/*! cachier - v1.0.1 - 2015-05-06
 * https://github.com/SparebankenVest/cachierJS
 * Copyright (c) 2015 Sparebanken Vest <opensource@spv.no>; Licensed MIT */
 // Original can be found at:
@@ -1347,6 +1347,7 @@
     return MD5;
 }(this));
 Function.prototype.bind = Function.prototype.bind || function (thisp) {
+    'use strict';
     var fn = this;
     return function () {
         return fn.apply(thisp, arguments);
@@ -1369,8 +1370,8 @@ Function.prototype.bind = Function.prototype.bind || function (thisp) {
         debug: false,
         hashLength: 32,
         hashCheck: /^[0-9a-f]{32}$/i, // 32 character hex (lower case)
-        outputToConsole: console.log.bind(console),
-        outputError: console.error.bind(console),
+        outputToConsole: console.log.bind(console), // jshint ignore:line
+        outputError: console.error.bind(console), // jshint ignore:line
         cachebustFileTypes: undefined, // these files should be cache-busted, undefined means all, can be specified with an array [".js",".css"]
         tamperCheckFileTypes: undefined, // undefined means all, can be specified with an array [".js",".css"]
         progressStates: loadStates.ADD + loadStates.NOUPDATE + loadStates.REPLACE + loadStates.REMOVE + loadStates.TAMPEREDREMOVE,
@@ -1410,13 +1411,6 @@ Function.prototype.bind = Function.prototype.bind || function (thisp) {
 
     //noinspection UnnecessaryLocalVariableJS
     var lsImpl = {
-        isSupported: function () {
-            try {
-                return 'localStorage' in window && window.localStorage !== null;
-            } catch (e) {
-                return false;
-            }
-        },
         replace: function (oldKey, key, responseText, messageHandler) {
             this.remove(oldKey);
             this.set(key, responseText, messageHandler, loadStates.REPLACE);
@@ -1522,11 +1516,12 @@ Function.prototype.bind = Function.prototype.bind || function (thisp) {
         hasKey: function (match) {
             var ls = this.getAll();
             for (var ind in ls) {
-                //noinspection JSUnfilteredForInLoop
-                var key = ls[ind];
-                // TODO Jasmine test is needed for this; path /test can give a match on /testing
-                if (key.indexOf(match) > -1) {
-                    return true;
+                if(ls.hasOwnProperty(ind)) {
+                    var key = ls[ind];
+                    // TODO Jasmine test is needed for this; path /test can give a match on /testing
+                    if (key.indexOf(match) > -1) {
+                        return true;
+                    }
                 }
             }
             return false;
@@ -1581,11 +1576,12 @@ Function.prototype.bind = Function.prototype.bind || function (thisp) {
                 jsonparsesum += (new Date().getTime() - measure);
 
                 measure = new Date().getTime();
-                if (config.tamperChecker(tamperCheck) === prefixedKey.substring(prefixedKey.lastIndexOf("_") + 1)) {
+                var fileHash = config.tamperChecker(tamperCheck);
+                if (fileHash === prefixedKey.substring(prefixedKey.lastIndexOf("_") + 1)) {
                     hashsum += (new Date().getTime() - measure);
                     return false; // tampering not detected, report untampered
                 } else {
-                    return true; // tamper detected!
+                    return fileHash; // tamper detected!
                 }
             } else {
                 return false; // not checking this file, report untampered
@@ -1652,13 +1648,14 @@ Function.prototype.bind = Function.prototype.bind || function (thisp) {
 
     var manifestFeed = function (key, state, success) {
         /**
-         1 = doesn't exist, needs to be inserted
-         2 = exists, doesn't need update
-         4 = exists, but needs update
-         8 = exists, but should be removed
+         1  = doesn't exist, needs to be inserted
+         2  = exists, doesn't need update
+         4  = exists, but needs update
+         8  = exists, but should be removed
+         16 = tampered
          */
         completeIndex++;
-        if (config.progressStates & state && ls.onprogress && index < total) {
+        if (config.progressStates & state && ls.onprogress && index < total) { // jshint ignore:line
             index++;
 
             var message = "[" + index + " of " + total;
@@ -1731,9 +1728,10 @@ Function.prototype.bind = Function.prototype.bind || function (thisp) {
             bustdate.setFullYear(new Date().getFullYear() - 1);
             xhr.setRequestHeader("Cache-Control", "no-cache");
             xhr.setRequestHeader("If-Modified-Since", bustdate.toUTCString());
-            xhr.setRequestHeader("If-None-Match", "\"" + Math.abs(Math.random() * 1e9 | 0).toString() + "\"");
+            xhr.setRequestHeader("If-None-Match", "\"" + Math.abs(Math.random() * 1e9 | 0).toString() + "\""); // jshint ignore:line
             xhr.setRequestHeader("Pragma", "no-cache");
         }
+        xhr.setRequestHeader("X-Requested-With", "XMLHttpRequest");
 
         xhr.onreadystatechange = function () {
             if (xhr.readyState === 4) {
@@ -1776,6 +1774,7 @@ Function.prototype.bind = Function.prototype.bind || function (thisp) {
 
     // use globalEval to evaluate files, inspiration taken from jQuery
     var globalEval = function (expr) {
+        // jshint evil:true
         if (expr && expr.length > 0) {
             (window.execScript || function (expr) {
                 window["eval"].call(window, expr);
@@ -1879,11 +1878,13 @@ Function.prototype.bind = Function.prototype.bind || function (thisp) {
              */
             if (config.doTamperCheckOnInit === true) {
                 for (itemKey in lsItems) {
-                    //noinspection JSUnfilteredForInLoop
-                    lsItem = lsItems[itemKey];
-                    if (storage.isTampered(lsItem)) {
-                        tamperQ.push({key: lsItem});
-                        storage.removeTampered(lsItem);
+                    if(lsItems.hasOwnProperty(itemKey)) {
+                        lsItem = lsItems[itemKey];
+                        var tamperHash = storage.isTampered(lsItem);
+                        if (tamperHash) {
+                            tamperQ.push({key: lsItem, tamperHash: tamperHash});
+                            storage.removeTampered(lsItem);
+                        }
                     }
                 }
             }
@@ -1930,23 +1931,24 @@ Function.prototype.bind = Function.prototype.bind || function (thisp) {
 
             // clean up (remove files not listed in manifest)
             for (itemKey in lsItems) {
-                //noinspection JSUnfilteredForInLoop
-                lsItem = lsItems[itemKey];
-                removeQ.push({key: lsItem});
+                if(lsItems.hasOwnProperty(itemKey)) {
+                    lsItem = lsItems[itemKey];
+                    removeQ.push({key: lsItem});
+                }
             }
 
             completeTotal = noupdateQ.length + replaceQ.length + addQ.length + removeQ.length + tamperQ.length;
+            //jshint bitwise:false
             total = ((config.progressStates & loadStates.NOUPDATE) ? noupdateQ.length : 0) +
-            ((config.progressStates & loadStates.REPLACE) ? replaceQ.length : 0) +
-            ((config.progressStates & loadStates.ADD) ? addQ.length : 0) +
-            ((config.progressStates & loadStates.REMOVE) ? removeQ.length : 0) +
-            ((config.progressStates & loadStates.TAMPEREDREMOVE) ? tamperQ.length : 0);
-
+                    ((config.progressStates & loadStates.REPLACE) ? replaceQ.length : 0) +
+                    ((config.progressStates & loadStates.ADD) ? addQ.length : 0) +
+                    ((config.progressStates & loadStates.REMOVE) ? removeQ.length : 0);
+            //jshint bitwise:true
             ls.onstart(total);
 
             // tampered files reporting (removal done before)
             for (i = 0; i < tamperQ.length; i++) {
-                ls.ontamperedresource(tamperQ[i].key);
+                ls.ontamperedresource(tamperQ[i].key, tamperQ[i].tamperHash);
                 manifestFeed(tamperQ[i].key, loadStates.TAMPEREDREMOVE, true);
             }
 
@@ -2030,37 +2032,27 @@ Function.prototype.bind = Function.prototype.bind || function (thisp) {
          * e is an object
          * { total: int, index: int, key: string, loadstate: int, success: bool }
          */
-        onprogress: function (e) {
-            void(e);
-        },
+        onprogress: function (e) { },
 
         /**
          * When preloader reports completed
          */
-        oncomplete: function () {
-
-        },
+        oncomplete: function () { },
 
         /**
          * On loading of preloader, before manifest is loaded
          */
-        onload: function () {
-
-        },
+        onload: function () { },
 
         /**
          * When manifest has been loaded, and preloader starts to sync items
          */
-        onstart: function (total) {
-            void(total);
-        },
+        onstart: function (total) { },
 
         /**
          * If a file is tampered this function can be used to log
          */
-        ontamperedresource: function (resource) {
-            void(resource);
-        }
+        ontamperedresource: function (resource, tamperHash) { }
     };
 
     if (typeof exports === 'object') {
