@@ -1,7 +1,7 @@
 # CachierJS
 
-[min]: https://raw.github.com/SparebankenVest/cachierJS/master/dist/cachier-1.0.0.min.js
-[max]: https://raw.github.com/SparebankenVest/cachierJS/master/dist/cachier-1.0.0.js
+[min]: https://raw.github.com/SparebankenVest/cachierJS/master/dist/cachier-1.0.1.min.js
+[max]: https://raw.github.com/SparebankenVest/cachierJS/master/dist/cachier-1.0.1.js
 
 Javascript preloader for Javascript, CSS and HTML (Application Cache alternative)
 
@@ -13,7 +13,7 @@ Download the [production version][min] or the [development version][max].
 In your web page (example):
 
 ```html
-<script src="dist/cachier-1.0.0.min.js"></script>
+<script src="dist/cachier-1.0.1.min.js"></script>
 <script>
 var preloadConfig = {
     prefix: '__myprefix__',
@@ -93,6 +93,8 @@ In lieu of a formal styleguide, take care to maintain the existing coding style.
 _Also, please don't edit files in the "dist" subdirectory as they are generated via Grunt. You'll find source code in the "lib" subdirectory!_
 
 ## Release History
+2015-05-05 - v1.0.1 - Added measured hash to ```ontamperedresource``` callback, wrote more tests
+
 2015-04-24 - v1.0.0 - Initial release
 
 ## TODO
