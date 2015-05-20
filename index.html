@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+    <meta charset='utf-8'>
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <meta name="description" content="Cachierjs : Javascript preloader for JS, CSS and HTML (Application Cache alternative)">
+
+    <link rel="stylesheet" type="text/css" media="screen" href="stylesheets/stylesheet.css">
+
+    <title>Cachierjs</title>
+  </head>
+
+  <body>
+
+    <!-- HEADER -->
+    <div id="header_wrap" class="outer">
+        <header class="inner">
+          <a id="forkme_banner" href="https://github.com/hnilsen/cachierJS">View on GitHub</a>
+
+          <h1 id="project_title">Cachierjs</h1>
+          <h2 id="project_tagline">Javascript preloader for JS, CSS and HTML (Application Cache alternative)</h2>
+
+            <section id="downloads">
+              <a class="zip_download_link" href="https://github.com/hnilsen/cachierJS/zipball/master">Download this project as a .zip file</a>
+              <a class="tar_download_link" href="https://github.com/hnilsen/cachierJS/tarball/master">Download this project as a tar.gz file</a>
+            </section>
+        </header>
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <div id="main_content_wrap" class="outer">
+      <section id="main_content" class="inner">
+        <h1>
+<a id="cachierjs" class="anchor" href="#cachierjs" aria-hidden="true"><span class="octicon octicon-link"></span></a>CachierJS</h1>
+
+<p>Javascript preloader for Javascript, CSS and HTML (Application Cache alternative)</p>
+
+<h2>
+<a id="getting-started" class="anchor" href="#getting-started" aria-hidden="true"><span class="octicon octicon-link"></span></a>Getting Started</h2>
+
+<h3>
+<a id="in-the-browser" class="anchor" href="#in-the-browser" aria-hidden="true"><span class="octicon octicon-link"></span></a>In the browser</h3>
+
+<p>Download the <a href="https://raw.github.com/SparebankenVest/cachierJS/master/dist/cachier-1.0.1.min.js">production version</a> or the <a href="https://raw.github.com/SparebankenVest/cachierJS/master/dist/cachier-1.0.1.js">development version</a>.</p>
+
+<p>In your web page (example):</p>
+
+<div class="highlight highlight-html"><pre>&lt;<span class="pl-ent">script</span> <span class="pl-e">src</span>=<span class="pl-s"><span class="pl-pds">"</span>dist/cachier-1.0.1.min.js<span class="pl-pds">"</span></span>&gt;&lt;/<span class="pl-ent">script</span>&gt;
+<span class="pl-s1">&lt;<span class="pl-ent">script</span>&gt;</span>
+<span class="pl-s1"><span class="pl-k">var</span> preloadConfig <span class="pl-k">=</span> {</span>
+<span class="pl-s1">    prefix<span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">'</span>__myprefix__<span class="pl-pds">'</span></span>,</span>
+<span class="pl-s1">    debug<span class="pl-k">:</span> <span class="pl-c1">true</span>,</span>
+<span class="pl-s1">    progressStates<span class="pl-k">:</span> <span class="pl-c1">1</span><span class="pl-k">+</span><span class="pl-c1">2</span><span class="pl-k">+</span><span class="pl-c1">4</span><span class="pl-k">+</span><span class="pl-c1">8</span><span class="pl-k">+</span><span class="pl-c1">16</span></span>
+<span class="pl-s1">}</span>
+<span class="pl-s1"></span>
+<span class="pl-s1">preload.init(preloadConfig); <span class="pl-c">// initialize with config</span></span>
+<span class="pl-s1">preload.loadManifest(<span class="pl-s"><span class="pl-pds">'</span>/manifest.json<span class="pl-pds">'</span></span>); <span class="pl-c">// load manifest for awesome stuff</span></span>
+<span class="pl-s1">&lt;/<span class="pl-ent">script</span>&gt;</span></pre></div>
+
+<h2>
+<a id="documentation" class="anchor" href="#documentation" aria-hidden="true"><span class="octicon octicon-link"></span></a>Documentation</h2>
+
+<p>CachierJS is a complete offline cache preloading solution for all your html, css and javascript. It uses MD5 as both version
+control and integrity checking. It can integrity (tamper) check files on initialization and/or on loading of files (eval).</p>
+
+<p>The preloader relies on a <code>manifest</code> that describes the resources it should preload in the following format:</p>
+
+<div class="highlight highlight-javascript"><pre>[
+    {
+    <span class="pl-s"><span class="pl-pds">"</span>url<span class="pl-pds">"</span></span><span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">"</span>/index.html<span class="pl-pds">"</span></span>,
+    <span class="pl-s"><span class="pl-pds">"</span>hash<span class="pl-pds">"</span></span><span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">"</span>bd01856bfd2065d0d1ee20c03bd3a9af<span class="pl-pds">"</span></span>
+    },
+    {
+    <span class="pl-s"><span class="pl-pds">"</span>url<span class="pl-pds">"</span></span><span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">"</span>/myscript.js<span class="pl-pds">"</span></span>,
+    <span class="pl-s"><span class="pl-pds">"</span>hash<span class="pl-pds">"</span></span><span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">"</span>273604bfeef7126abe1f9bff1e45126c<span class="pl-pds">"</span></span>
+    }
+]</pre></div>
+
+<p>The preloader has a few options which can be overridden:</p>
+
+<div class="highlight highlight-javascript"><pre>   <span class="pl-k">var</span> config <span class="pl-k">=</span> {
+        prefix<span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">"</span>__ls__<span class="pl-pds">"</span></span>,
+        debug<span class="pl-k">:</span> <span class="pl-c1">false</span>,
+        hashLength<span class="pl-k">:</span> <span class="pl-c1">32</span>,
+        hashCheck<span class="pl-k">:</span><span class="pl-sr"> <span class="pl-pds">/</span><span class="pl-k">^</span><span class="pl-c1">[<span class="pl-c1">0-9a-f</span>]</span><span class="pl-k">{32}</span><span class="pl-k">$</span><span class="pl-pds">/</span>i</span>, <span class="pl-c">// 32 character hex (lower case)</span>
+        outputToConsole<span class="pl-k">:</span> <span class="pl-en">console</span><span class="pl-c1">.log</span>.bind(<span class="pl-en">console</span>),
+        outputError<span class="pl-k">:</span> <span class="pl-en">console</span><span class="pl-c1">.error</span>.bind(<span class="pl-en">console</span>),
+        cachebustFileTypes<span class="pl-k">:</span> <span class="pl-c1">undefined</span>, <span class="pl-c">// these files should be cache-busted, undefined means all, can be specified with an array [".js",".css"]</span>
+        tamperCheckFileTypes<span class="pl-k">:</span> <span class="pl-c1">undefined</span>, <span class="pl-c">// undefined means all, can be specified with an array [".js",".css"]</span>
+        progressStates<span class="pl-k">:</span> loadStates.ADD <span class="pl-k">+</span> loadStates.NOUPDATE <span class="pl-k">+</span> loadStates.REPLACE <span class="pl-k">+</span> loadStates.REMOVE <span class="pl-k">+</span> loadStates.TAMPEREDREMOVE,
+        doTamperCheckOnLoad<span class="pl-k">:</span> <span class="pl-c1">false</span>, <span class="pl-c">// perform tamper checking on dynamic script/css/page load</span>
+        doTamperCheckOnInit<span class="pl-k">:</span> <span class="pl-c1">true</span>, <span class="pl-c">// perform tamper checking when preloader is initialized</span>
+        <span class="pl-en">tamperChecker</span>: <span class="pl-k">function</span> (<span class="pl-smi">file</span>) { <span class="pl-c">// included YaMD5 hasher can be overwritten by a different hasher</span>
+            <span class="pl-k">return</span> <span class="pl-c1">window</span>.YaMD5.hashStr(file);
+        },
+        resourceTimeout<span class="pl-k">:</span> <span class="pl-c1">30000</span>
+    };</pre></div>
+
+<p>The config initializes the preloader by running <code>preload.init(config);</code>.</p>
+
+<p>To start preloading, there are two options;</p>
+
+<ul>
+<li>preload.loadManifest(url);</li>
+<li>preload.checkManifest(json);</li>
+</ul>
+
+<p>loadManifest(url) fetches the manifest online, and pushes it into checkManifest afterwards. If you do not have an online
+manifest, you can simply push the json directly into preload.checkManifest(json);</p>
+
+<h2>
+<a id="examples" class="anchor" href="#examples" aria-hidden="true"><span class="octicon octicon-link"></span></a>Examples</h2>
+
+<p><em>(Coming soon)</em></p>
+
+<h2>
+<a id="building" class="anchor" href="#building" aria-hidden="true"><span class="octicon octicon-link"></span></a>Building</h2>
+
+<pre><code>npm install
+</code></pre>
+
+<pre><code>grunt
+</code></pre>
+
+<h2>
+<a id="contributing" class="anchor" href="#contributing" aria-hidden="true"><span class="octicon octicon-link"></span></a>Contributing</h2>
+
+<p>In lieu of a formal styleguide, take care to maintain the existing coding style. Add unit tests for any new or changed functionality. Lint and test your code using <a href="http://gruntjs.com/">Grunt</a>.</p>
+
+<p><em>Also, please don't edit files in the "dist" subdirectory as they are generated via Grunt. You'll find source code in the "lib" subdirectory!</em></p>
+
+<h2>
+<a id="release-history" class="anchor" href="#release-history" aria-hidden="true"><span class="octicon octicon-link"></span></a>Release History</h2>
+
+<p>2015-05-05 - v1.0.1 - Added measured hash to <code>ontamperedresource</code> callback, wrote more tests</p>
+
+<p>2015-04-24 - v1.0.0 - Initial release</p>
+
+<h2>
+<a id="todo" class="anchor" href="#todo" aria-hidden="true"><span class="octicon octicon-link"></span></a>TODO</h2>
+
+<ul>
+<li>Proper AMD</li>
+<li>Add more testing</li>
+<li>Create wiki page for preloader config options</li>
+</ul>
+
+<h2>
+<a id="license" class="anchor" href="#license" aria-hidden="true"><span class="octicon octicon-link"></span></a>License</h2>
+
+<p>Copyright (c) 2015 Sparebanken Vest
+Licensed under the MIT license.</p>
+      </section>
+    </div>
+
+    <!-- FOOTER  -->
+    <div id="footer_wrap" class="outer">
+      <footer class="inner">
+        <p class="copyright">Cachierjs maintained by <a href="https://github.com/hnilsen">hnilsen</a></p>
+        <p>Published with <a href="https://pages.github.com">GitHub Pages</a></p>
+      </footer>
+    </div>
+
+              <script type="text/javascript">
+            var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+            document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+          </script>
+          <script type="text/javascript">
+            try {
+              var pageTracker = _gat._getTracker("UA-63200294-1");
+            pageTracker._trackPageview();
+            } catch(err) {}
+          </script>
+
+
+  </body>
+</html>
